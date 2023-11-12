@@ -1,0 +1,87 @@
+﻿<mah:MetroWindow x:Class="XFYun.SparkChat.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:sdk="clr-namespace:XFYun.SparkChat.SDK"
+        xmlns:vm="clr-namespace:XFYun.SparkChat.ViewModels"  
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:converter="clr-namespace:XFYun.SparkChat.Converters"
+        xmlns:iconPack="http://metro.mahapps.com/winfx/xaml/iconpacks"
+        xmlns:local="clr-namespace:XFYun.SparkChat"
+        mc:Ignorable="d"
+        Title="Spark Chat" Height="650" Width="1000" d:DataContext="{d:DesignInstance vm:MainWindowViewModel}">
+    <Window.InputBindings>
+        <KeyBinding Key="Enter" Command="{Binding SendCmd}"></KeyBinding>
+    </Window.InputBindings>
+    <Window.Resources>
+        <converter:InverseBoolConverter x:Key="InverseBoolConverter"></converter:InverseBoolConverter>
+        <ObjectDataProvider x:Key="SparkVersions" MethodName="GetValues" ObjectType="{x:Type sdk:SparkVersions}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type Type="sdk:SparkVersions" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition Height="100"></RowDefinition>
+        </Grid.RowDefinitions>
+        <GroupBox Margin="5" Header="Config">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="2" IsEnabled="{Binding IsConnected,Converter={StaticResource InverseBoolConverter}}">
+                    <TextBlock VerticalAlignment="Center" Width="70">ApiKey:</TextBlock>
+                    <TextBox Width="300" Height="30" Text="{Binding ApiKey}"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="2" IsEnabled="{Binding IsConnected,Converter={StaticResource InverseBoolConverter}}">
+                    <TextBlock VerticalAlignment="Center" Width="70">ApiSecret:</TextBlock>
+                    <TextBox Width="300" Height="30" Text="{Binding ApiSecret}"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="2">
+                    <StackPanel Orientation="Horizontal" IsEnabled="{Binding IsConnected,Converter={StaticResource InverseBoolConverter}}">
+                        <TextBlock VerticalAlignment="Center" Width="70">AppId:</TextBlock>
+                        <TextBox Width="300" Height="30" Text="{Binding AppId}"></TextBox>
+
+                        <ComboBox Margin="10,0,0,0" SelectedItem="{Binding  SelectedVersion,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" ItemsSource="{Binding Source={StaticResource SparkVersions}}" Width="100"></ComboBox>
+                    </StackPanel>
+                    
+                    <TextBlock Margin="10,0,0,0" VerticalAlignment="Center"></TextBlock>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Header="Chat" Margin="5" Grid.Row="1">
+            <ListBox ItemsSource="{Binding Messages}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <StackPanel Margin="2" Orientation="Horizontal">
+                                <TextBlock MaxWidth="950" TextWrapping="Wrap" x:Name="tb" Text="{Binding Text}"></TextBlock>
+                            </StackPanel>
+                        </Grid>
+                       
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding MessageType}" Value="Send">
+                                <Setter TargetName="tb" Property="Foreground" Value="Green"></Setter>
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </GroupBox>
+        <Grid Margin="5" Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition Width="auto"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <TextBox AcceptsReturn="True"  mah:TextBoxHelper.ClearTextButton="True" mah:TextBoxHelper.Watermark="Please enter the question"  Margin="2" Text="{Binding MsgToSend,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBox>
+            <Button Grid.Column="1" Width="100" Margin="10,0,0,0" Command="{Binding SendCmd}">
+                <StackPanel Orientation="Horizontal">
+                    <iconPack:PackIconBoxIcons Kind="RegularMailSend"></iconPack:PackIconBoxIcons>
+                    <TextBlock Margin="10,0,0,0">Send</TextBlock>
+                </StackPanel>
+            </Button>
+        </Grid>
+    </Grid>
+</mah:MetroWindow>
